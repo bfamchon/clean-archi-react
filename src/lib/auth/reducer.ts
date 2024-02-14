@@ -28,4 +28,4 @@ export const reducer = createReducer<AuthState>(
 );
 
 export const selectIsUserAuthenticated = (rootState: RootState) => Boolean(rootState.auth.authUser);
-export const selectAuthenticatedUser = (rootState: RootState) => rootState.auth.authUser || '';
+export const selectAuthenticatedUser = (rootState: RootState) => rootState.auth.authUser ?? '';

@@ -7,11 +7,13 @@ import { createRouter } from '@/router';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import { FakeAuthStorageGateway } from './lib/auth/adapters/fake-storage-auth.gateway';
 
-const authGateway = new FakeAuthGateway(100);
-authGateway.willSucceedWithGoogleForUser = 'Baptiste';
-authGateway.willSucceedWithGitHubForUser = 'Bob';
+const fakeAuthGateway = new FakeAuthGateway(100);
+fakeAuthGateway.willSucceedWithGoogleForUser = 'Baptiste';
+fakeAuthGateway.willSucceedWithGitHubForUser = 'Bob';
 const watchBoxesGateway = new FakeWatchBoxGateway(2000);
+const authGateway = new FakeAuthStorageGateway(fakeAuthGateway);
 
 const builder = watchBoxBuilder();
 

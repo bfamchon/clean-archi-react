@@ -2,7 +2,12 @@ import { AuthGateway, AuthUser } from '../model/auth.gateway';
 
 export class FakeAuthGateway implements AuthGateway {
   constructor(private readonly delay = 0) {}
-  private onAuthStateChangeListener!: (user: AuthUser) => void;
+  onAuthStateChangeListener: (user: AuthUser) => void = () => {
+    return;
+  };
+  authUser!: string;
+  willSucceedWithGoogleForUser!: string;
+  willSucceedWithGitHubForUser!: string;
 
   onAuthStateChanged(listener: (user: AuthUser) => void): void {
     this.onAuthStateChangeListener = listener;
@@ -26,9 +31,6 @@ export class FakeAuthGateway implements AuthGateway {
   simulateAuthStateChange(authUser: AuthUser) {
     this.onAuthStateChangeListener(authUser);
   }
-  authUser!: string;
-  willSucceedWithGoogleForUser!: string;
-  willSucceedWithGitHubForUser!: string;
 }
 
 export const authGateway = new FakeAuthGateway();
