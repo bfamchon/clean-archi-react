@@ -25,7 +25,7 @@ watchBoxesGateway.watchBoxByUser.set(
     .withName('Frontend')
     .withArticles([
       { id: 'article-1', name: 'xyz', sharedBy: 'Baptiste', sharedAt: '2023-01-01T12:00:00.000Z' },
-      { id: 'article-2', name: 'abc', sharedBy: 'Baptiste', sharedAt: '2023-01-01T12:10:00.000Z' }
+      { id: 'article-2', name: 'abc', sharedBy: 'Bob', sharedAt: '2023-01-01T12:10:00.000Z' }
     ])
     .build()
 );
@@ -37,7 +37,7 @@ watchBoxesGateway.watchBoxByUser.set(
     .withUser('Bob')
     .withName('Backend')
     .withArticles([
-      { id: 'article-3', name: 'xyz', sharedBy: 'Bob', sharedAt: '2023-01-01T22:00:00.000Z' },
+      { id: 'article-3', name: 'xyz', sharedBy: 'Baptiste', sharedAt: '2023-01-01T22:00:00.000Z' },
       { id: 'article-4', name: 'abc', sharedBy: 'Bob', sharedAt: '2023-01-01T22:10:00.000Z' }
     ])
     .build()
