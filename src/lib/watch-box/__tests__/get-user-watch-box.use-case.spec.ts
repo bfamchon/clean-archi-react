@@ -4,6 +4,7 @@ import { beforeEach, describe, it } from 'vitest';
 
 describe('Feature: Retrieving user watch box', () => {
   let fixture: WatchBoxFixture;
+
   beforeEach(() => {
     fixture = createWatchBoxFixture();
   });

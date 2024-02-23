@@ -1,16 +1,21 @@
+import { AuthFixture, createAuthFixture } from '@/lib/auth/__tests__/auth.fixture';
+import { stateBuilderProvider } from '@/lib/state.builder';
 import { watchBoxBuilder } from '@/lib/watch-box/utils/watch-box.builder';
 import { beforeEach, describe, it } from 'vitest';
 import { WatchBoxFixture, createWatchBoxFixture } from './watch-box.fixture';
 
 describe('Feature: Retrieving authenticated user watch box', () => {
   let fixture: WatchBoxFixture;
+  let authFixture: AuthFixture;
   beforeEach(() => {
-    fixture = createWatchBoxFixture();
+    const testStateBuilderProvider = stateBuilderProvider();
+    fixture = createWatchBoxFixture(testStateBuilderProvider);
+    authFixture = createAuthFixture(testStateBuilderProvider);
   });
   it('Example: Baptiste is authenticated and can see his watch box', async () => {
     const builder = watchBoxBuilder();
     // prepare store
-    fixture.givenAuthenticatedUserIs('Baptiste');
+    authFixture.givenAuthenticatedUserIs('Baptiste');
     fixture.givenExistingWatchBox(
       builder
         .withId('wb-1')

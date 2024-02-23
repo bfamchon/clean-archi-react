@@ -46,3 +46,18 @@ export const stateBuilder = (baseState = initialState) => {
     }
   };
 };
+
+export const stateBuilderProvider = () => {
+  let builder = stateBuilder();
+  return {
+    getState() {
+      return builder.build();
+    },
+    setState(updateFn: (_builder: StateBuilder) => StateBuilder) {
+      builder = updateFn(builder);
+    }
+  };
+};
+
+export type StateBuilder = ReturnType<typeof stateBuilder>;
+export type StateBuilderProvider = ReturnType<typeof stateBuilderProvider>;

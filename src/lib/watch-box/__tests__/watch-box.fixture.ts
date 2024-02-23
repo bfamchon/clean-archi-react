@@ -1,27 +1,19 @@
 import { FakeAuthGateway } from '@/lib/auth/adapters/fake-auth.gateway';
+import { selectAuthenticatedUser } from '@/lib/auth/reducer';
 import { AppStore, createTestStore } from '@/lib/create-store';
-import { stateBuilder } from '@/lib/state.builder';
+import { stateBuilder, stateBuilderProvider } from '@/lib/state.builder';
 import { FakeWatchBoxGateway } from '@/lib/watch-box/adapters/fake-watch-box-gateway';
 import { WatchBoxResponse } from '@/lib/watch-box/model/watch-box.gateway';
 import { selectIsUserWatchBoxLoading } from '@/lib/watch-box/slices/watch-boxes.slice';
 import { getUserWatchBox } from '@/lib/watch-box/usecases/get-user-watch-box.usecase';
 import { expect } from 'vitest';
 
-export const createWatchBoxFixture = () => {
+export const createWatchBoxFixture = (testStateBuilderProvider = stateBuilderProvider()) => {
   const authGateway = new FakeAuthGateway();
   const watchBoxesGateway = new FakeWatchBoxGateway();
   let store: AppStore;
-  let testStateBuilder = stateBuilder();
-  let expectedStateBuilder = stateBuilder();
-  let authUserId: string;
 
   return {
-    givenAuthenticatedUserIs(user: string) {
-      authGateway.authUser = user;
-      testStateBuilder = testStateBuilder.withAuthUser({ authUser: user });
-      authUserId = user;
-      expectedStateBuilder = expectedStateBuilder.withAuthUser({ authUser: user });
-    },
     givenExistingWatchBox(watchBox: WatchBoxResponse) {
       watchBoxesGateway.watchBoxByUser.set(watchBox.user, watchBox);
     },
@@ -31,15 +23,16 @@ export const createWatchBoxFixture = () => {
           authGateway,
           watchBoxesGateway
         },
-        testStateBuilder.build()
+        testStateBuilderProvider.getState()
       );
       await store.dispatch(getUserWatchBox({ userId }));
     },
     async whenRetrievingAuthenticatedUserWatchBox() {
+      const authUserId = selectAuthenticatedUser(testStateBuilderProvider.getState());
       return this.whenRetrievingUserWatchBox(authUserId);
     },
     thenWatchBoxShouldBe(expectedWatchBox: WatchBoxResponse) {
-      const expectedState = expectedStateBuilder
+      const expectedState = stateBuilder(testStateBuilderProvider.getState())
         .withWatchBox({
           id: expectedWatchBox.id,
           name: expectedWatchBox.name,
