@@ -1,18 +1,16 @@
-import { FakeAuthGateway } from '@/lib/auth/adapters/fake-auth.gateway';
-import { AppStore, createStore } from '@/lib/create-store';
-import { stateBuilder } from '@/lib/state.builder';
-import { FakeWatchBoxGateway } from '@/lib/watch-box/adapters/fake-watch-box-gateway';
-import { WatchBoxResponse } from '@/lib/watch-box/model/watch-box.gateway';
-import { selectIsUserWatchBoxLoading } from '@/lib/watch-box/slices/watch-boxes.slice';
-import { getUserWatchBox } from '@/lib/watch-box/usecases/get-user-watch-box.usecase';
+import { WatchBoxFixture, createWatchBoxFixture } from '@/lib/watch-box/__tests__/watch-box.fixture';
 import { watchBoxBuilder } from '@/lib/watch-box/utils/watch-box.builder';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, it } from 'vitest';
 
 describe('Feature: Retrieving user watch box', () => {
+  let fixture: WatchBoxFixture;
+  beforeEach(() => {
+    fixture = createWatchBoxFixture();
+  });
   it('Example: We are on Bob profile', async () => {
     const builder = watchBoxBuilder();
     // prepare store
-    givenExistingWatchBox(
+    fixture.givenExistingWatchBox(
       builder
         .withId('wb-1')
         .withUser('Bob')
@@ -22,14 +20,14 @@ describe('Feature: Retrieving user watch box', () => {
         ])
         .build()
     );
-    const retrievingWatchBox = whenRetrievingUserWatchBox('Bob');
+    const retrievingWatchBox = fixture.whenRetrievingUserWatchBox('Bob');
 
     // make action
-    thenWatchBoxOfUserShouldBeLoading('Bob');
+    fixture.thenWatchBoxOfUserShouldBeLoading('Bob');
 
     await retrievingWatchBox;
     // verify that store is ok
-    thenWatchBoxShouldBe(
+    fixture.thenWatchBoxShouldBe(
       builder
         .withId('wb-1')
         .withUser('Bob')
@@ -41,42 +39,3 @@ describe('Feature: Retrieving user watch box', () => {
     );
   });
 });
-
-const authGateway = new FakeAuthGateway();
-const watchBoxesGateway = new FakeWatchBoxGateway();
-let store: AppStore;
-const testStateBuilder = stateBuilder();
-
-function givenExistingWatchBox(watchBox: WatchBoxResponse) {
-  watchBoxesGateway.watchBoxByUser.set('Bob', watchBox);
-}
-
-async function whenRetrievingUserWatchBox(userId: string) {
-  store = createStore(
-    {
-      authGateway,
-      watchBoxesGateway
-    },
-    testStateBuilder.build()
-  );
-  await store.dispatch(getUserWatchBox({ userId }));
-}
-
-function thenWatchBoxShouldBe(expectedWatchBox: WatchBoxResponse) {
-  const expectedState = stateBuilder()
-    .withWatchBox({
-      id: expectedWatchBox.id,
-      name: expectedWatchBox.name,
-      user: expectedWatchBox.user,
-      articles: expectedWatchBox.articles.map((a) => a.id)
-    })
-    .withArticles(expectedWatchBox.articles)
-    .withLoadedWatchBoxOf({ user: 'Bob' })
-    .build();
-  expect(store.getState()).toEqual(expectedState);
-}
-
-function thenWatchBoxOfUserShouldBeLoading(userId: string) {
-  const isUserWatchBoxLoading = selectIsUserWatchBoxLoading(userId, store.getState());
-  expect(isUserWatchBoxLoading).toBe(true);
-}
