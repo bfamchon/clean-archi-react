@@ -4,9 +4,10 @@ import {
   getAuthUserWatchBox,
   getAuthUserWatchBoxPending
 } from '@/lib/watch-box/usecases/get-auth-user-watch-box.usecase';
-import { EntityState, createSlice } from '@reduxjs/toolkit';
+import { getUserWatchBox } from '@/lib/watch-box/usecases/get-user-watch-box.usecase';
+import { EntityState, createSlice, isAnyOf } from '@reduxjs/toolkit';
 
-export type WatchBoxesSliceState = EntityState<WatchBox> & {
+export type WatchBoxesSliceState = EntityState<WatchBox, ''> & {
   loadingWatchBoxesByUser: { [userId: string]: boolean };
 };
 
@@ -17,21 +18,41 @@ export const watchBoxesSlice = createSlice({
   }) as WatchBoxesSliceState,
   reducers: {},
   extraReducers(builder) {
-    builder.addCase(getAuthUserWatchBoxPending, (state, action) => {
-      state.loadingWatchBoxesByUser[action.payload.authUser] = true;
-    });
-    builder.addCase(getAuthUserWatchBox.fulfilled, (state, action) => {
-      const watchBox = action.payload;
-      watchBoxAdapter.addOne(state, {
-        id: watchBox.id,
-        name: watchBox.name,
-        user: watchBox.user,
-        articles: watchBox.articles.map((a) => a.id)
+    builder
+      .addCase(getAuthUserWatchBoxPending, (state, action) => {
+        setUserWatchBoxLoadingState(state, {
+          userId: action.payload.authUser,
+          loading: true
+        });
+      })
+      .addCase(getUserWatchBox.pending, (state, action) => {
+        setUserWatchBoxLoadingState(state, {
+          userId: action.meta.arg.userId,
+          loading: true
+        });
+      })
+      .addMatcher(isAnyOf(getAuthUserWatchBox.fulfilled, getUserWatchBox.fulfilled), (state, action) => {
+        const watchBox = action.payload;
+        watchBoxAdapter.addOne(state, {
+          id: watchBox.id,
+          name: watchBox.name,
+          user: watchBox.user,
+          articles: watchBox.articles.map((a) => a.id)
+        });
+        setUserWatchBoxLoadingState(state, {
+          userId: watchBox.user,
+          loading: false
+        });
       });
-      state.loadingWatchBoxesByUser[watchBox.user] = false;
-    });
   }
 });
+
+const setUserWatchBoxLoadingState = (
+  state: WatchBoxesSliceState,
+  { userId, loading }: { userId: string; loading: boolean }
+) => {
+  state.loadingWatchBoxesByUser[userId] = loading;
+};
 
 export const selectWatchBoxes = (state: RootState) =>
   watchBoxAdapter.getSelectors().selectAll(state.watchBoxes.watchBoxes);
