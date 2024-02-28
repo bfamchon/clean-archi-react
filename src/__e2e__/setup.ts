@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
 import { afterEach, expect, vitest } from 'vitest';
 
@@ -6,16 +7,12 @@ import * as matchers from '@testing-library/jest-dom/matchers';
 import { fetch, Request, Response } from '@remix-run/web-fetch';
 
 if (!globalThis.fetch) {
-  // Built-in lib.dom.d.ts expects `fetch(Request | string, ...)` but the web
-  // fetch API allows a URL so @remix-run/web-fetch defines
-  // `fetch(string | URL | Request, ...)`
-  // @ts-expect-error
+  // @ts-expect-error Built-in lib.dom.d.ts expects `fetch(Request | string, ...)`
+  // but the web fetch API allows a URL so @remix-run/web-fetch defines `fetch(string | URL | Request, ...)`
   globalThis.fetch = fetch;
-  // Same as above, lib.dom.d.ts doesn't allow a URL to the Request constructor
-  // @ts-expect-error
+  // @ts-expect-error Same as above, lib.dom.d.ts doesn't allow a URL to the Request constructor
   globalThis.Request = Request;
-  // web-std/fetch Response does not currently implement Response.error()
-  // @ts-expect-error
+  // @ts-expect-error web-std/fetch Response does not currently implement Response.error()
   globalThis.Response = Response;
 }
 
