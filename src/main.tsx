@@ -24,8 +24,18 @@ watchBoxesGateway.watchBoxByUser.set(
     .withUser('Baptiste')
     .withName('Frontend')
     .withArticles([
-      { id: 'article-1', name: 'xyz', sharedBy: 'Baptiste', sharedAt: '2023-01-01T12:00:00.000Z' },
-      { id: 'article-2', name: 'abc', sharedBy: 'Bob', sharedAt: '2023-01-01T12:10:00.000Z' }
+      {
+        id: 'article-1',
+        name: 'Design-system 101',
+        sharedBy: 'Baptiste',
+        sharedAt: '2023-01-01T12:00:00.000Z'
+      },
+      {
+        id: 'article-2',
+        name: 'SafeTest introduction',
+        sharedBy: 'Bob',
+        sharedAt: '2023-01-01T12:10:00.000Z'
+      }
     ])
     .build()
 );
@@ -37,8 +47,36 @@ watchBoxesGateway.watchBoxByUser.set(
     .withUser('Bob')
     .withName('Backend')
     .withArticles([
-      { id: 'article-3', name: 'xyz', sharedBy: 'Baptiste', sharedAt: '2023-01-01T22:00:00.000Z' },
-      { id: 'article-4', name: 'abc', sharedBy: 'Bob', sharedAt: '2023-01-01T22:10:00.000Z' }
+      {
+        id: 'article-3',
+        name: 'NodeJS v36 unveiled',
+        sharedBy: 'Alice',
+        sharedAt: '2023-01-01T22:00:00.000Z'
+      },
+      {
+        id: 'article-4',
+        name: 'Why you should not use PHP ?',
+        sharedBy: 'Bob',
+        sharedAt: '2023-01-01T22:10:00.000Z'
+      }
+    ])
+    .build()
+);
+
+watchBoxesGateway.watchBoxByUser.set(
+  'Alice',
+  builder
+    .withId('wb-2')
+    .withUser('Alice')
+    .withName('Tooling')
+    .withArticles([
+      {
+        id: 'article-5',
+        name: 'Extension VSCode',
+        sharedBy: 'Baptiste',
+        sharedAt: '2023-01-01T22:00:00.000Z'
+      },
+      { id: 'article-6', name: 'Terminal custom', sharedBy: 'Baptiste', sharedAt: '2023-01-01T22:10:00.000Z' }
     ])
     .build()
 );

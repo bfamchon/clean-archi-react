@@ -1,19 +1,24 @@
 import { createTestStore } from '@/lib/create-store';
 import { stateBuilder } from '@/lib/state.builder';
-import { selectHomeViewModel } from '@/pages/Home/home.view-model';
+import {
+  ProfileWatchBoxViewModelType,
+  selectProfileWatchBoxViewModel
+} from '@/pages/Profile/ProfileWatchBox/profile-watch-box.view-model';
 import { beforeEach, describe, expect, test } from 'vitest';
 
 const getNow = () => '2023-01-01T12:00:00.000Z';
 
-describe('Home view model', () => {
+describe('Profile watch-box view model', () => {
   beforeEach(() => {});
   test('Example: there is no watch boxes in the store', () => {
     const store = createTestStore();
 
-    const homeViewModel = selectHomeViewModel(store.getState(), getNow);
+    const profileWatchBoxViewModel = selectProfileWatchBoxViewModel({ userId: 'Baptiste', getNow })(
+      store.getState()
+    );
 
-    expect(homeViewModel).toEqual({
-      type: 'NO_WATCH_BOX'
+    expect(profileWatchBoxViewModel).toEqual({
+      type: ProfileWatchBoxViewModelType.NO_WATCH_BOX
     });
   });
   test('Example: there is no articles in the watch box', () => {
@@ -28,10 +33,12 @@ describe('Home view model', () => {
       .build();
     const store = createTestStore({}, initialState);
 
-    const homeViewModel = selectHomeViewModel(store.getState(), getNow);
+    const profileWatchBoxViewModel = selectProfileWatchBoxViewModel({ userId: 'Baptiste', getNow })(
+      store.getState()
+    );
 
-    expect(homeViewModel).toEqual({
-      type: 'EMPTY_WATCH_BOX',
+    expect(profileWatchBoxViewModel).toEqual({
+      type: ProfileWatchBoxViewModelType.EMPTY_WATCH_BOX,
       info: 'There is no articles yet in this watch box'
     });
   });
@@ -56,10 +63,12 @@ describe('Home view model', () => {
       .build();
     const store = createTestStore({}, initialState);
 
-    const homeViewModel = selectHomeViewModel(store.getState(), getNow);
+    const profileWatchBoxViewModel = selectProfileWatchBoxViewModel({ userId: 'Baptiste', getNow })(
+      store.getState()
+    );
 
-    expect(homeViewModel).toEqual({
-      type: 'WATCH_BOX_WITH_ARTICLES',
+    expect(profileWatchBoxViewModel).toEqual({
+      type: ProfileWatchBoxViewModelType.WATCH_BOX_WITH_ARTICLES,
       articles: [
         {
           id: 'a-1',
@@ -106,10 +115,12 @@ describe('Home view model', () => {
       .build();
     const store = createTestStore({}, initialState);
 
-    const homeViewModel = selectHomeViewModel(store.getState(), getNow);
+    const profileWatchBoxViewModel = selectProfileWatchBoxViewModel({ userId: 'Baptiste', getNow })(
+      store.getState()
+    );
 
-    expect(homeViewModel).toEqual({
-      type: 'WATCH_BOX_WITH_ARTICLES',
+    expect(profileWatchBoxViewModel).toEqual({
+      type: ProfileWatchBoxViewModelType.WATCH_BOX_WITH_ARTICLES,
       articles: [
         {
           id: 'a-1',
@@ -140,10 +151,12 @@ describe('Home view model', () => {
       .build();
     const store = createTestStore({}, initialState);
 
-    const homeViewModel = selectHomeViewModel(store.getState(), getNow);
+    const profileWatchBoxViewModel = selectProfileWatchBoxViewModel({ userId: 'Baptiste', getNow })(
+      store.getState()
+    );
 
-    expect(homeViewModel).toEqual({
-      type: 'WATCH_BOX_LOADING',
+    expect(profileWatchBoxViewModel).toEqual({
+      type: ProfileWatchBoxViewModelType.WATCH_BOX_LOADING,
       info: 'Loading...'
     });
   });

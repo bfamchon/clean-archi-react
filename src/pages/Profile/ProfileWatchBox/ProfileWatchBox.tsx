@@ -1,5 +1,8 @@
-import { ArticleList } from '@/components/ArticleList';
+import { WatchBox } from '@/components/WatchBox';
+import { useParams } from 'react-router-dom';
 
 export const ProfileWatchBox = () => {
-  return <ArticleList articles={[]} />;
+  const params = useParams();
+
+  return <WatchBox userId={params.userId as string} />;
 };
