@@ -14,7 +14,7 @@ const withLoadedWatchBoxOf = createAction<{ user: string }>('withLoadedWatchBoxO
 
 const reducer = createReducer(initialState, (builder) => {
   builder.addCase(withWatchBox, (state, action) => {
-    watchBoxAdapter.addOne(state.watchBoxes.watchBoxes, action.payload);
+    watchBoxAdapter.upsertOne(state.watchBoxes.watchBoxes, action.payload);
   });
   builder.addCase(withAuthUser, (state, action) => {
     state.auth.authUser = action.payload.authUser;

@@ -2,19 +2,27 @@ import { onAuthStateChangeListener } from '@/lib/auth/listeners/on-auth-state-ch
 import { AuthGateway } from '@/lib/auth/model/auth.gateway';
 import { rootReducer } from '@/lib/root-reducer';
 import { WatchBoxGateway } from '@/lib/watch-box/model/watch-box.gateway';
-import { AnyAction, Middleware, ThunkDispatch, configureStore } from '@reduxjs/toolkit';
+import { Action, Middleware, ThunkDispatch, configureStore, isAction } from '@reduxjs/toolkit';
 import { FakeAuthGateway } from './auth/adapters/fake-auth.gateway';
+import { FakeArticleGateway } from './watch-box/adapters/fake-article.gateway';
 import { FakeWatchBoxGateway } from './watch-box/adapters/fake-watch-box-gateway';
+import { RealDateProvider } from './watch-box/adapters/real-date-provider';
+import { ArticleGateway } from './watch-box/model/article.gateway';
+import { DateProvider } from './watch-box/model/date-provider';
 
 export type Dependencies = {
   authGateway: AuthGateway;
   watchBoxesGateway: WatchBoxGateway;
+  articleGateway: ArticleGateway;
+  dateProvider: DateProvider;
 };
 
 export const createStore = (dependencies: Dependencies, preloadedState?: Partial<RootState>) => {
-  const actions: AnyAction[] = [];
+  const actions: Action[] = [];
   const logActionsMiddleware: Middleware = () => (next) => (action) => {
-    actions.push(action);
+    if (isAction(action)) {
+      actions.push(action);
+    }
     return next(action);
   };
 
@@ -38,12 +46,14 @@ export const createStore = (dependencies: Dependencies, preloadedState?: Partial
 export const createTestStore = (
   {
     authGateway = new FakeAuthGateway(),
-    watchBoxesGateway = new FakeWatchBoxGateway()
+    watchBoxesGateway = new FakeWatchBoxGateway(),
+    articleGateway = new FakeArticleGateway(),
+    dateProvider = new RealDateProvider()
   }: Partial<Dependencies> = {},
   preloadedState?: Partial<RootState>
-) => createStore({ authGateway, watchBoxesGateway }, preloadedState);
+) => createStore({ authGateway, watchBoxesGateway, articleGateway, dateProvider }, preloadedState);
 
 type AppStoreWithGetActions = ReturnType<typeof createStore>;
 export type AppStore = Omit<AppStoreWithGetActions, 'getActions'>;
 export type RootState = ReturnType<typeof rootReducer>;
-export type AppDispatch = ThunkDispatch<RootState, Dependencies, AnyAction>;
+export type AppDispatch = ThunkDispatch<RootState, Dependencies, Action>;

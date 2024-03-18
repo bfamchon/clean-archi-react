@@ -11,7 +11,7 @@ describe('Feature: Retrieving user watch box', () => {
   it('Example: We are on Bob profile', async () => {
     const builder = watchBoxBuilder();
     // prepare store
-    fixture.givenExistingWatchBox(
+    fixture.givenExistingRemoteWatchBox(
       builder
         .withId('wb-1')
         .withUser('Bob')

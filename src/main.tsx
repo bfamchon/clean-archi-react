@@ -1,89 +1,28 @@
 import { Provider } from '@/Provider.tsx';
 import { FakeAuthGateway } from '@/lib/auth/adapters/fake-auth.gateway.ts';
 import { createStore } from '@/lib/create-store.ts';
-import { FakeWatchBoxGateway } from '@/lib/watch-box/adapters/fake-watch-box-gateway.ts';
-import { watchBoxBuilder } from '@/lib/watch-box/utils/watch-box.builder.ts';
 import { createRouter } from '@/router';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import { FakeAuthStorageGateway } from './lib/auth/adapters/fake-storage-auth.gateway';
+import { users } from './lib/fake-data';
+import { FakeArticleGateway } from './lib/watch-box/adapters/fake-article.gateway';
+import { FakeDataWatchBoxGateway } from './lib/watch-box/adapters/fake-data-watch-box.gateway';
+import { RealDateProvider } from './lib/watch-box/adapters/real-date-provider';
 
 const fakeAuthGateway = new FakeAuthGateway(100);
-fakeAuthGateway.willSucceedWithGoogleForUser = 'Baptiste';
-fakeAuthGateway.willSucceedWithGitHubForUser = 'Bob';
-const watchBoxesGateway = new FakeWatchBoxGateway(2000);
+fakeAuthGateway.willSucceedWithGoogleForUser = users.values().next().value;
+fakeAuthGateway.willSucceedWithGitHubForUser = users.values().next().value;
+const watchBoxesGateway = new FakeDataWatchBoxGateway(2000);
 const authGateway = new FakeAuthStorageGateway(fakeAuthGateway);
-
-const builder = watchBoxBuilder();
-
-watchBoxesGateway.watchBoxByUser.set(
-  'Baptiste',
-  builder
-    .withId('wb-1')
-    .withUser('Baptiste')
-    .withName('Frontend')
-    .withArticles([
-      {
-        id: 'article-1',
-        name: 'Design-system 101',
-        sharedBy: 'Baptiste',
-        sharedAt: '2023-01-01T12:00:00.000Z'
-      },
-      {
-        id: 'article-2',
-        name: 'SafeTest introduction',
-        sharedBy: 'Bob',
-        sharedAt: '2023-01-01T12:10:00.000Z'
-      }
-    ])
-    .build()
-);
-
-watchBoxesGateway.watchBoxByUser.set(
-  'Bob',
-  builder
-    .withId('wb-2')
-    .withUser('Bob')
-    .withName('Backend')
-    .withArticles([
-      {
-        id: 'article-3',
-        name: 'NodeJS v36 unveiled',
-        sharedBy: 'Alice',
-        sharedAt: '2023-01-01T22:00:00.000Z'
-      },
-      {
-        id: 'article-4',
-        name: 'Why you should not use PHP ?',
-        sharedBy: 'Bob',
-        sharedAt: '2023-01-01T22:10:00.000Z'
-      }
-    ])
-    .build()
-);
-
-watchBoxesGateway.watchBoxByUser.set(
-  'Alice',
-  builder
-    .withId('wb-2')
-    .withUser('Alice')
-    .withName('Tooling')
-    .withArticles([
-      {
-        id: 'article-5',
-        name: 'Extension VSCode',
-        sharedBy: 'Baptiste',
-        sharedAt: '2023-01-01T22:00:00.000Z'
-      },
-      { id: 'article-6', name: 'Terminal custom', sharedBy: 'Baptiste', sharedAt: '2023-01-01T22:10:00.000Z' }
-    ])
-    .build()
-);
-
+const dateProvider = new RealDateProvider();
+const articleGateway = new FakeArticleGateway();
 const store = createStore({
   authGateway,
-  watchBoxesGateway
+  watchBoxesGateway,
+  dateProvider,
+  articleGateway
 });
 
 const router = createRouter({ store });

@@ -4,16 +4,21 @@ import { getAuthUserWatchBox } from '@/lib/watch-box/usecases/get-auth-user-watc
 
 import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { getUserWatchBox } from '../usecases/get-user-watch-box.usecase';
+import { postArticlesPending } from '../usecases/post-article.usecase';
 
 export const articlesSlice = createSlice({
   name: 'articles',
   initialState: articleAdapter.getInitialState(),
   reducers: {},
   extraReducers(builder) {
-    builder.addMatcher(isAnyOf(getAuthUserWatchBox.fulfilled, getUserWatchBox.fulfilled), (state, action) => {
-      const articles = action.payload.articles;
-      articleAdapter.addMany(state, articles);
-    });
+    builder
+      .addCase(postArticlesPending, (state, action) => {
+        articleAdapter.addOne(state, action.payload);
+      })
+      .addMatcher(isAnyOf(getAuthUserWatchBox.fulfilled, getUserWatchBox.fulfilled), (state, action) => {
+        const articles = action.payload.articles;
+        articleAdapter.addMany(state, articles);
+      });
   }
 });
 

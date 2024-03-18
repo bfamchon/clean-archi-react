@@ -16,7 +16,7 @@ describe('Feature: Retrieving authenticated user watch box', () => {
     const builder = watchBoxBuilder();
     // prepare store
     authFixture.givenAuthenticatedUserIs('Baptiste');
-    fixture.givenExistingWatchBox(
+    fixture.givenExistingRemoteWatchBox(
       builder
         .withId('wb-1')
         .withUser('Baptiste')

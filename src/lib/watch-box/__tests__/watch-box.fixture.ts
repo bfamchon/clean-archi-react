@@ -7,15 +7,29 @@ import { WatchBoxResponse } from '@/lib/watch-box/model/watch-box.gateway';
 import { selectIsUserWatchBoxLoading } from '@/lib/watch-box/slices/watch-boxes.slice';
 import { getUserWatchBox } from '@/lib/watch-box/usecases/get-user-watch-box.usecase';
 import { expect } from 'vitest';
+import { FakeArticleGateway } from '../adapters/fake-article.gateway';
+import { StubDateProvider } from '../adapters/stub-date-provider';
+import { WatchBox } from '../model/watch-box.entity';
+import { PostArticleParams, postArticles } from '../usecases/post-article.usecase';
 
 export const createWatchBoxFixture = (testStateBuilderProvider = stateBuilderProvider()) => {
   const authGateway = new FakeAuthGateway();
   const watchBoxesGateway = new FakeWatchBoxGateway();
+  const articleGateway = new FakeArticleGateway();
+  const dateProvider = new StubDateProvider();
   let store: AppStore;
 
   return {
-    givenExistingWatchBox(watchBox: WatchBoxResponse) {
+    givenNow(now: Date) {
+      dateProvider.now = now;
+    },
+    givenExistingRemoteWatchBox(watchBox: WatchBoxResponse) {
       watchBoxesGateway.watchBoxByUser.set(watchBox.user, watchBox);
+    },
+    givenWatchBox(watchBox: WatchBox) {
+      testStateBuilderProvider.setState((builder) =>
+        builder.withWatchBox(watchBox).withLoadedWatchBoxOf({ user: watchBox.user })
+      );
     },
     async whenRetrievingUserWatchBox(userId: string) {
       store = createTestStore(
@@ -30,6 +44,25 @@ export const createWatchBoxFixture = (testStateBuilderProvider = stateBuilderPro
     async whenRetrievingAuthenticatedUserWatchBox() {
       const authUserId = selectAuthenticatedUser(testStateBuilderProvider.getState());
       return this.whenRetrievingUserWatchBox(authUserId);
+    },
+    async whenUserPostArticle(postArticleParams: PostArticleParams) {
+      store = createTestStore(
+        {
+          dateProvider,
+          articleGateway
+        },
+        testStateBuilderProvider.getState()
+      );
+      return store.dispatch(postArticles(postArticleParams));
+    },
+    thenArticleShouldHaveBeenPosted(expectedPostedMessage: {
+      id: string;
+      watchBoxId: string;
+      name: string;
+      sharedAt: string;
+      sharedBy: string;
+    }) {
+      expect(articleGateway.lastPostedArticle).toEqual(expectedPostedMessage);
     },
     thenWatchBoxShouldBe(expectedWatchBox: WatchBoxResponse) {
       const expectedState = stateBuilder(testStateBuilderProvider.getState())

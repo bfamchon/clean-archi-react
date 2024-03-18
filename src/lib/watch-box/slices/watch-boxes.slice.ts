@@ -6,6 +6,7 @@ import {
 } from '@/lib/watch-box/usecases/get-auth-user-watch-box.usecase';
 import { getUserWatchBox } from '@/lib/watch-box/usecases/get-user-watch-box.usecase';
 import { EntityState, createSlice, isAnyOf } from '@reduxjs/toolkit';
+import { postArticles } from '../usecases/post-article.usecase';
 
 export type WatchBoxesSliceState = EntityState<WatchBox, ''> & {
   loadingWatchBoxesByUser: { [userId: string]: boolean };
@@ -29,6 +30,14 @@ export const watchBoxesSlice = createSlice({
         setUserWatchBoxLoadingState(state, {
           userId: action.meta.arg.userId,
           loading: true
+        });
+      })
+      .addCase(postArticles.pending, (state, action) => {
+        watchBoxAdapter.updateOne(state, {
+          id: action.meta.arg.watchBoxId,
+          changes: {
+            articles: [action.meta.arg.articleId]
+          }
         });
       })
       .addMatcher(isAnyOf(getAuthUserWatchBox.fulfilled, getUserWatchBox.fulfilled), (state, action) => {
