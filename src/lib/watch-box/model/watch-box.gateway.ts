@@ -1,13 +1,10 @@
+import { Article } from "@/lib/watch-box/model/article.entity";
+
 export type WatchBoxResponse = {
   name: string;
   id: string;
   user: string;
-  articles: {
-    name: string;
-    id: string;
-    sharedBy: string;
-    sharedAt: string;
-  }[];
+  articles: Article[];
 };
 
 export type GetUserWatchBoxResponse = {

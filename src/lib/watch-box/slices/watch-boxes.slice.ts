@@ -33,10 +33,13 @@ export const watchBoxesSlice = createSlice({
         });
       })
       .addCase(postArticles.pending, (state, action) => {
+        const watchBox = watchBoxAdapter.getSelectors().selectById(state, action.meta.arg.watchBoxId);
+        if(!watchBox) return;
+
         watchBoxAdapter.updateOne(state, {
           id: action.meta.arg.watchBoxId,
           changes: {
-            articles: [action.meta.arg.articleId]
+            articles: [ ...watchBox.articles, action.meta.arg.articleId]
           }
         });
       })

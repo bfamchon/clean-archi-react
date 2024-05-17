@@ -9,7 +9,6 @@ import { getUserWatchBox } from '@/lib/watch-box/usecases/get-user-watch-box.use
 import { expect } from 'vitest';
 import { FakeArticleGateway } from '../adapters/fake-article.gateway';
 import { StubDateProvider } from '../adapters/stub-date-provider';
-import { WatchBox } from '../model/watch-box.entity';
 import { PostArticleParams, postArticles } from '../usecases/post-article.usecase';
 
 export const createWatchBoxFixture = (testStateBuilderProvider = stateBuilderProvider()) => {
@@ -26,9 +25,12 @@ export const createWatchBoxFixture = (testStateBuilderProvider = stateBuilderPro
     givenExistingRemoteWatchBox(watchBox: WatchBoxResponse) {
       watchBoxesGateway.watchBoxByUser.set(watchBox.user, watchBox);
     },
-    givenWatchBox(watchBox: WatchBox) {
+    givenWatchBox(watchBox: WatchBoxResponse) {
       testStateBuilderProvider.setState((builder) =>
-        builder.withWatchBox(watchBox).withLoadedWatchBoxOf({ user: watchBox.user })
+        builder.withWatchBox({
+          ...watchBox,
+          articles: watchBox.articles.map((a) => a.id)
+        }).withArticles(watchBox.articles).withLoadedWatchBoxOf({ user: watchBox.user })
       );
     },
     async whenRetrievingUserWatchBox(userId: string) {

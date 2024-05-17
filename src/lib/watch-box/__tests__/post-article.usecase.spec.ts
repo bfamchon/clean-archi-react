@@ -53,4 +53,58 @@ describe('Feature: Posting an article in a watch-box', () => {
         .build()
     );
   });
+
+  test('Example: Baptiste post an article on his watch-box already containing articles', async () => {
+    const builder = watchBoxBuilder();
+    const now = new Date('2024-01-01T01:00:00.000Z');
+
+    authFixture.givenAuthenticatedUserIs('Baptiste');
+    fixture.givenNow(now);
+    fixture.givenWatchBox({
+      id: 'wb-1',
+      name: 'wb-1',
+      user: 'Baptiste',
+      articles: [
+        {
+            id: 'art-1',
+            name: 'Frontend weekly',
+            sharedAt: now.toISOString(),
+            sharedBy: 'Baptiste'
+          }
+      ]
+    });
+    await fixture.whenUserPostArticle({
+      articleId: 'art-2',
+      name: 'Backend weekly',
+      watchBoxId: 'wb-1'
+    });
+    fixture.thenArticleShouldHaveBeenPosted({
+      id: 'art-2',
+      watchBoxId: 'wb-1',
+      name: 'Backend weekly',
+      sharedAt: now.toISOString(),
+      sharedBy: 'Baptiste'
+    });
+    fixture.thenWatchBoxShouldBe(
+      builder
+        .withId('wb-1')
+        .withName('wb-1')
+        .withUser('Baptiste')
+        .withArticles([
+          {
+            id: 'art-1',
+            name: 'Frontend weekly',
+            sharedAt: now.toISOString(),
+            sharedBy: 'Baptiste'
+          },
+           {
+            id: 'art-2',
+            name: 'Backend weekly',
+            sharedAt: now.toISOString(),
+            sharedBy: 'Baptiste'
+          }
+        ])
+        .build()
+    );
+  });
 });
